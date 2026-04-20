@@ -1,314 +1,408 @@
 package sx126x
 
 const (
-	// SX126X physical layer properties
-	SX126X_FREQUENCY_STEP_SIZE = 0.9536743164
-	SX126X_MAX_PACKET_LENGTH   = 255
-	SX126X_CRYSTAL_FREQ        = 32.0
-	SX126X_DIV_EXPONENT        = 25
-
 	// SX126X SPI commands
-	// operational modes commands
-	SX126X_CMD_NOP                      = 0x00
-	SX126X_CMD_SET_SLEEP                = 0x84
-	SX126X_CMD_SET_STANDBY              = 0x80
-	SX126X_CMD_SET_FS                   = 0xC1
-	SX126X_CMD_SET_TX                   = 0x83
-	SX126X_CMD_SET_RX                   = 0x82
-	SX126X_CMD_STOP_TIMER_ON_PREAMBLE   = 0x9F
-	SX126X_CMD_SET_RX_DUTY_CYCLE        = 0x94
-	SX126X_CMD_SET_CAD                  = 0xC5
-	SX126X_CMD_SET_TX_CONTINUOUS_WAVE   = 0xD1
-	SX126X_CMD_SET_TX_INFINITE_PREAMBLE = 0xD2
-	SX126X_CMD_SET_REGULATOR_MODE       = 0x96
-	SX126X_CMD_CALIBRATE                = 0x89
-	SX126X_CMD_CALIBRATE_IMAGE          = 0x98
-	SX126X_CMD_SET_PA_CONFIG            = 0x95
-	SX126X_CMD_SET_RX_TX_FALLBACK_MODE  = 0x93
 
-	// register and buffer access commands
-	SX126X_CMD_WRITE_REGISTER = 0x0D
-	SX126X_CMD_READ_REGISTER  = 0x1D
-	SX126X_CMD_WRITE_BUFFER   = 0x0E
-	SX126X_CMD_READ_BUFFER    = 0x1E
+	// Operational Modes
+	CMD_SET_SLEEP                = 0x84
+	CMD_SET_STANDBY              = 0x80
+	CMD_SET_FS                   = 0xC1
+	CMD_SET_TX                   = 0x83
+	CMD_SET_RX                   = 0x82
+	CMD_STOP_TIMER_ON_PREAMBLE   = 0x9F
+	CMD_SET_RX_DUTY_CYCLE        = 0x94
+	CMD_SET_CAD                  = 0xC5
+	CMD_SET_TX_CONTINUOUS_WAVE   = 0xD1
+	CMD_SET_TX_INFINITE_PREAMBLE = 0xD2
+	CMD_SET_REGULATOR_MODE       = 0x96
+	CMD_CALIBRATE                = 0x89
+	CMD_CALIBRATE_IMAGE          = 0x98
+	CMD_SET_PA_CONFIG            = 0x95
+	CMD_SET_RX_TX_FALLBACK_MODE  = 0x93
 
-	// DIO and IRQ control
-	SX126X_CMD_SET_DIO_IRQ_PARAMS         = 0x08
-	SX126X_CMD_GET_IRQ_STATUS             = 0x12
-	SX126X_CMD_CLEAR_IRQ_STATUS           = 0x02
-	SX126X_CMD_SET_DIO2_AS_RF_SWITCH_CTRL = 0x9D
-	SX126X_CMD_SET_DIO3_AS_TCXO_CTRL      = 0x97
+	// Register and Buffer Access
+	CMD_WRITE_REGISTER = 0x0D
+	CMD_READ_REGISTER  = 0x1D
+	CMD_WRITE_BUFFER   = 0x0E
+	CMD_READ_BUFFER    = 0x1E
 
-	// RF, modulation and packet commands
-	SX126X_CMD_SET_RF_FREQUENCY          = 0x86
-	SX126X_CMD_SET_PACKET_TYPE           = 0x8A
-	SX126X_CMD_GET_PACKET_TYPE           = 0x11
-	SX126X_CMD_SET_TX_PARAMS             = 0x8E
-	SX126X_CMD_SET_MODULATION_PARAMS     = 0x8B
-	SX126X_CMD_SET_PACKET_PARAMS         = 0x8C
-	SX126X_CMD_SET_CAD_PARAMS            = 0x88
-	SX126X_CMD_SET_BUFFER_BASE_ADDRESS   = 0x8F
-	SX126X_CMD_SET_LORA_SYMB_NUM_TIMEOUT = 0x0A
+	// DIO and IRQ Control
+	CMD_SET_DIO_IRQ_PARAMS         = 0x08
+	CMD_GET_IRQ_STATUS             = 0x12
+	CMD_CLEAR_IRQ_STATUS           = 0x02
+	CMD_SET_DIO2_AS_RF_SWITCH_CTRL = 0x9D
+	CMD_SET_DIO3_AS_TCXO_CTRL      = 0x97
 
-	// status commands
-	SX126X_CMD_GET_STATUS           = 0xC0
-	SX126X_CMD_GET_RSSI_INST        = 0x15
-	SX126X_CMD_GET_RX_BUFFER_STATUS = 0x13
-	SX126X_CMD_GET_PACKET_STATUS    = 0x14
-	SX126X_CMD_GET_DEVICE_ERRORS    = 0x17
-	SX126X_CMD_CLEAR_DEVICE_ERRORS  = 0x07
-	SX126X_CMD_GET_STATS            = 0x10
-	SX126X_CMD_RESET_STATS          = 0x00
+	// RF, Modulation and Packet
+	CMD_SET_RF_FREQUENCY          = 0x86
+	CMD_SET_PACKET_TYPE           = 0x8A
+	CMD_GET_PACKET_TYPE           = 0x11
+	CMD_SET_TX_PARAMS             = 0x8E
+	CMD_SET_MODULATION_PARAMS     = 0x8B
+	CMD_SET_PACKET_PARAMS         = 0x8C
+	CMD_SET_CAD_PARAMS            = 0x88
+	CMD_SET_BUFFER_BASE_ADDRESS   = 0x8F
+	CMD_SET_LORA_SYMB_NUM_TIMEOUT = 0xA0
 
-	// SX126X register map
-	SX126X_REG_WHITENING_INITIAL_MSB = 0x06B8
-	SX126X_REG_WHITENING_INITIAL_LSB = 0x06B9
-	SX126X_REG_CRC_INITIAL_MSB       = 0x06BC
-	SX126X_REG_CRC_INITIAL_LSB       = 0x06BD
-	SX126X_REG_CRC_POLYNOMIAL_MSB    = 0x06BE
-	SX126X_REG_CRC_POLYNOMIAL_LSB    = 0x06BF
-	SX126X_REG_SYNC_WORD_0           = 0x06C0
-	SX126X_REG_SYNC_WORD_1           = 0x06C1
-	SX126X_REG_SYNC_WORD_2           = 0x06C2
-	SX126X_REG_SYNC_WORD_3           = 0x06C3
-	SX126X_REG_SYNC_WORD_4           = 0x06C4
-	SX126X_REG_SYNC_WORD_5           = 0x06C5
-	SX126X_REG_SYNC_WORD_6           = 0x06C6
-	SX126X_REG_SYNC_WORD_7           = 0x06C7
-	SX126X_REG_NODE_ADDRESS          = 0x06CD
-	SX126X_REG_BROADCAST_ADDRESS     = 0x06CE
-	SX126X_REG_LORA_SYNC_WORD_MSB    = 0x0740
-	SX126X_REG_LORA_SYNC_WORD_LSB    = 0x0741
-	SX126X_REG_RANDOM_NUMBER_0       = 0x0819
-	SX126X_REG_RANDOM_NUMBER_1       = 0x081A
-	SX126X_REG_RANDOM_NUMBER_2       = 0x081B
-	SX126X_REG_RANDOM_NUMBER_3       = 0x081C
-	SX126X_REG_RX_GAIN               = 0x08AC
-	SX126X_REG_OCP_CONFIGURATION     = 0x08E7
-	SX126X_REG_XTA_TRIM              = 0x0911
-	SX126X_REG_XTB_TRIM              = 0x0912
+	// Status
+	CMD_GET_STATUS           = 0xC0
+	CMD_GET_RSSI_INST        = 0x15
+	CMD_GET_RX_BUFFER_STATUS = 0x13
+	CMD_GET_PACKET_STATUS    = 0x14
+	CMD_GET_DEVICE_ERRORS    = 0x17
+	CMD_CLEAR_DEVICE_ERRORS  = 0x07
+	CMD_GET_STATS            = 0x10
+	CMD_RESET_STATS          = 0x00
 
-	// undocumented registers
-	SX126X_REG_SENSITIVITY_CONFIG  = 0x0889 // SX1268 datasheet v1.1, section 15.1
-	SX126X_REG_TX_CLAMP_CONFIG     = 0x08D8 // SX1268 datasheet v1.1, section 15.2
-	SX126X_REG_RTC_STOP            = 0x0920 // SX1268 datasheet v1.1, section 15.3
-	SX126X_REG_RTC_EVENT           = 0x0944 // SX1268 datasheet v1.1, section 15.3
-	SX126X_REG_IQ_CONFIG           = 0x0736 // SX1268 datasheet v1.1, section 15.4
-	SX126X_REG_RX_GAIN_RETENTION_0 = 0x029F // SX1268 datasheet v1.1, section 9.6
-	SX126X_REG_RX_GAIN_RETENTION_1 = 0x02A0 // SX1268 datasheet v1.1, section 9.6
-	SX126X_REG_RX_GAIN_RETENTION_2 = 0x02A1 // SX1268 datasheet v1.1, section 9.6
+	// SleepConfig
+	SLEEP_COLD_START          = 0b00000000
+	SLEEP_WARM_START          = 0b00000100
+	SLEEP_RTC_TIMEOUT_DISABLE = 0b00000000
 
-	// SX126X SPI command variables
-	//SX126X_CMD_SET_SLEEP                                                MSB   LSB   DESCRIPTION
-	SX126X_SLEEP_START_COLD = 0b00000000 //  2     2     sleep mode: cold start, configuration is lost (default)
-	SX126X_SLEEP_START_WARM = 0b00000100 //  2     2                 warm start, configuration is retained
-	SX126X_SLEEP_RTC_OFF    = 0b00000000 //  0     0     wake on RTC timeout: disabled
-	SX126X_SLEEP_RTC_ON     = 0b00000001 //  0     0                          enabled
+	// StandbyConfig
+	STANDBY_RC   = 0b00000000
+	STANDBY_XOSC = 0b00000001
 
-	//SX126X_CMD_SET_STANDBY
-	SX126X_STANDBY_RC   = 0x00 //  7     0     standby mode: 13 MHz RC oscillator
-	SX126X_STANDBY_XOSC = 0x01 //  7     0                   32 MHz crystal oscillator
+	// RxContinuousMode
+	RX_CONTINUOUS_MODE = uint32(0xFFFFFF)
 
-	//SX126X_CMD_SET_RX
-	SX126X_RX_TIMEOUT_NONE = 0x000000 //  23    0     Rx timeout duration: no timeout (Rx single mode)
-	SX126X_RX_TIMEOUT_INF  = 0xFFFFFF //  23    0                          infinite (Rx continuous mode)
+	// StopTimerOnPreamble
+	STOP_TIMER_ON_PREAMBLE_DISABLE = uint8(0)
+	STOP_TIMER_ON_PREAMBLE_ENABLE  = uint8(1)
 
-	//SX126X_CMD_SET_TX
-	SX126X_TX_TIMEOUT_NONE = 0x000000 //  23    0     Tx timeout duration: no timeout (Tx single mode)
+	// RegModeParam
+	REG_MODE_LDO   = uint8(0)
+	REG_MODE_DC_DC = uint8(1)
 
-	//SX126X_CMD_STOP_TIMER_ON_PREAMBLE
-	SX126X_STOP_ON_PREAMBLE_OFF = 0x00 //  7     0     stop timer on: sync word or header (default)
-	SX126X_STOP_ON_PREAMBLE_ON  = 0x01 //  7     0                    preamble detection
+	// CalibParam
+	CALIBRATE_RC64K_DISABLE      = uint8(0b00000000)
+	CALIBRATE_RC64K_ENABLE       = uint8(0b00000001)
+	CALIBRATE_RC13M_DISABLE      = uint8(0b00000000)
+	CALIBRATE_RC13M_ENABLE       = uint8(0b00000010)
+	CALIBRATE_PLL_DISABLE        = uint8(0b00000000)
+	CALIBRATE_PLL_ENABLE         = uint8(0b00000100)
+	CALIBRATE_ADC_PULSE_DISABLE  = uint8(0b00000000)
+	CALIBRATE_ADC_PULSE_ENABLE   = uint8(0b00001000)
+	CALIBRATE_ADC_BULK_N_DISABLE = uint8(0b00000000)
+	CALIBRATE_ADC_BULK_N_ENABLE  = uint8(0b00010000)
+	CALIBRATE_ADC_BULK_P_DISABLE = uint8(0b00000000)
+	CALIBRATE_ADC_BULK_P_ENABLE  = uint8(0b00100000)
+	CALIBRATE_IMAGE_DISABLE      = uint8(0b00000000)
+	CALIBRATE_IMAGE_ENABLE       = uint8(0b01000000)
 
-	//SX126X_CMD_SET_REGULATOR_MODE
-	SX126X_REGULATOR_LDO   = 0x00 //  7     0     set regulator mode: LDO (default)
-	SX126X_REGULATOR_DC_DC = 0x01 //  7     0                         DC-DC
+	// PA Config
+	DEVICE_SEL_SX1262 = uint8(0x00)
+	DEVICE_SEL_SX1261 = uint8(0x01)
+	PA_LUT            = uint8(0x01)
 
-	//SX126X_CMD_CALIBRATE
-	SX126X_CALIBRATE_IMAGE_OFF      = 0b00000000 //  6     6     image calibration: disabled
-	SX126X_CALIBRATE_IMAGE_ON       = 0b01000000 //  6     6                        enabled
-	SX126X_CALIBRATE_ADC_BULK_P_OFF = 0b00000000 //  5     5     ADC bulk P calibration: disabled
-	SX126X_CALIBRATE_ADC_BULK_P_ON  = 0b00100000 //  5     5                             enabled
-	SX126X_CALIBRATE_ADC_BULK_N_OFF = 0b00000000 //  4     4     ADC bulk N calibration: disabled
-	SX126X_CALIBRATE_ADC_BULK_N_ON  = 0b00010000 //  4     4                             enabled
-	SX126X_CALIBRATE_ADC_PULSE_OFF  = 0b00000000 //  3     3     ADC pulse calibration: disabled
-	SX126X_CALIBRATE_ADC_PULSE_ON   = 0b00001000 //  3     3                            enabled
-	SX126X_CALIBRATE_PLL_OFF        = 0b00000000 //  2     2     PLL calibration: disabled
-	SX126X_CALIBRATE_PLL_ON         = 0b00000100 //  2     2                      enabled
-	SX126X_CALIBRATE_RC13M_OFF      = 0b00000000 //  1     1     13 MHz RC osc. calibration: disabled
-	SX126X_CALIBRATE_RC13M_ON       = 0b00000010 //  1     1                                 enabled
-	SX126X_CALIBRATE_RC64K_OFF      = 0b00000000 //  0     0     64 kHz RC osc. calibration: disabled
-	SX126X_CALIBRATE_RC64K_ON       = 0b00000001 //  0     0                                 enabled
-	SX126X_CALIBRATE_ALL            = 0b01111111 //  6     0     calibrate all blocks
+	// fallbackMode
+	FALLBACK_MODE_FS         = uint8(0x40)
+	FALLBACK_MODE_STDBY_XOSC = uint8(0x30)
+	FALLBACK_MODE_STDBY_RC   = uint8(0x20)
 
-	//SX126X_CMD_CALIBRATE_IMAGE
-	SX126X_CAL_IMG_430_MHZ_1 = 0x6B
-	SX126X_CAL_IMG_430_MHZ_2 = 0x6F
-	SX126X_CAL_IMG_470_MHZ_1 = 0x75
-	SX126X_CAL_IMG_470_MHZ_2 = 0x81
-	SX126X_CAL_IMG_779_MHZ_1 = 0xC1
-	SX126X_CAL_IMG_779_MHZ_2 = 0xC5
-	SX126X_CAL_IMG_863_MHZ_1 = 0xD7
-	SX126X_CAL_IMG_863_MHZ_2 = 0xDB
-	SX126X_CAL_IMG_902_MHZ_1 = 0xE1
-	SX126X_CAL_IMG_902_MHZ_2 = 0xE9
+	// IRQ Masks
+	IRQ_ALL_MASK               = uint16(0xFFFF)
+	IRQ_TX_DONE_MASK           = uint16(0b0000000000000001)
+	IRQ_RX_DONE_MASK           = uint16(0b0000000000000010)
+	IRQ_PREAMBLE_DETECTED_MASK = uint16(0b0000000000000100)
+	IRQ_SYNC_WORD_VALID_MASK   = uint16(0b0000000000001000)
+	IRQ_HEADER_VALID_MASK      = uint16(0b0000000000010000)
+	IRQ_HEADER_ERROR_MASK      = uint16(0b0000000000100000)
+	IRQ_CRC_ERROR_MASK         = uint16(0b0000000001000000)
+	IRQ_CAD_DONE_MASK          = uint16(0b0000000010000000)
+	IRQ_CAD_DETECTED_MASK      = uint16(0b0000000100000000)
+	IRQ_TIMEOUT_MASK           = uint16(0b0000001000000000)
+	IRQ_LR_FHSS_HOP_MASK       = uint16(0b0100000000000000)
 
-	//SX126X_CMD_SET_PA_CONFIG
-	SX126X_PA_CONFIG_HP_MAX   = 0x07
-	SX126X_PA_CONFIG_PA_LUT   = 0x01
-	SX126X_PA_CONFIG_SX1262_8 = 0x00
+	// tcxoVoltage
+	TCXO_VOLTAGE_1_6V = uint8(0x00)
+	TCXO_VOLTAGE_1_7V = uint8(0x01)
+	TCXO_VOLTAGE_1_8V = uint8(0x02)
+	TCXO_VOLTAGE_2_2V = uint8(0x03)
+	TCXO_VOLTAGE_2_4V = uint8(0x04)
+	TCXO_VOLTAGE_2_7V = uint8(0x05)
+	TCXO_VOLTAGE_3_0V = uint8(0x06)
+	TCXO_VOLTAGE_3_3V = uint8(0x07)
 
-	//SX126X_CMD_SET_RX_TX_FALLBACK_MODE
-	SX126X_RX_TX_FALLBACK_MODE_FS         = 0x40 //  7     0     after Rx/Tx go to: FS mode
-	SX126X_RX_TX_FALLBACK_MODE_STDBY_XOSC = 0x30 //  7     0                        standby with crystal oscillator
-	SX126X_RX_TX_FALLBACK_MODE_STDBY_RC   = 0x20 //  7     0                        standby with RC oscillator (default)
+	// PacketType
+	PACKET_TYPE_GFSK    = uint8(0x00)
+	PACKET_TYPE_LORA    = uint8(0x01)
+	PACKET_TYPE_LR_FHSS = uint8(0x02)
 
-	//SX126X_CMD_SET_DIO_IRQ_PARAMS
-	SX126X_IRQ_TIMEOUT           = 0b1000000000 //  9     9     Rx or Tx timeout
-	SX126X_IRQ_CAD_DETECTED      = 0b0100000000 //  8     8     channel activity detected
-	SX126X_IRQ_CAD_DONE          = 0b0010000000 //  7     7     channel activity detection finished
-	SX126X_IRQ_CRC_ERR           = 0b0001000000 //  6     6     wrong CRC received
-	SX126X_IRQ_HEADER_ERR        = 0b0000100000 //  5     5     LoRa header CRC error
-	SX126X_IRQ_HEADER_VALID      = 0b0000010000 //  4     4     valid LoRa header received
-	SX126X_IRQ_SYNC_WORD_VALID   = 0b0000001000 //  3     3     valid sync word detected
-	SX126X_IRQ_PREAMBLE_DETECTED = 0b0000000100 //  2     2     preamble detected
-	SX126X_IRQ_RX_DONE           = 0b0000000010 //  1     1     packet received
-	SX126X_IRQ_TX_DONE           = 0b0000000001 //  0     0     packet transmission completed
-	SX126X_IRQ_ALL               = 0b1111111111 //  9     0     all interrupts
-	SX126X_IRQ_NONE              = 0b0000000000 //  9     0     no interrupts
+	// RampTime
+	RADIO_RAMP_10U   = uint8(0x00)
+	RADIO_RAMP_20U   = uint8(0x01)
+	RADIO_RAMP_40U   = uint8(0x02)
+	RADIO_RAMP_80U   = uint8(0x03)
+	RADIO_RAMP_200U  = uint8(0x04)
+	RADIO_RAMP_800U  = uint8(0x05)
+	RADIO_RAMP_1700U = uint8(0x06)
+	RADIO_RAMP_3400U = uint8(0x07)
 
-	//SX126X_CMD_SET_DIO2_AS_RF_SWITCH_CTRL
-	SX126X_DIO2_AS_IRQ       = 0x00 //  7     0     DIO2 configuration: IRQ
-	SX126X_DIO2_AS_RF_SWITCH = 0x01 //  7     0                         RF switch control
+	// GFSK Modulation Params
 
-	//SX126X_CMD_SET_DIO3_AS_TCXO_CTRL
-	SX126X_DIO3_OUTPUT_1_6 = 0x00 //  7     0     DIO3 voltage output for TCXO: 1.6 V
-	SX126X_DIO3_OUTPUT_1_7 = 0x01 //  7     0                                   1.7 V
-	SX126X_DIO3_OUTPUT_1_8 = 0x02 //  7     0                                   1.8 V
-	SX126X_DIO3_OUTPUT_2_2 = 0x03 //  7     0                                   2.2 V
-	SX126X_DIO3_OUTPUT_2_4 = 0x04 //  7     0                                   2.4 V
-	SX126X_DIO3_OUTPUT_2_7 = 0x05 //  7     0                                   2.7 V
-	SX126X_DIO3_OUTPUT_3_0 = 0x06 //  7     0                                   3.0 V
-	SX126X_DIO3_OUTPUT_3_3 = 0x07 //  7     0                                   3.3 V
+	// PulseShape
+	GFSK_PULSE_SHAPE_NONE            = uint8(0x00)
+	GFSK_PULSE_SHAPE_GAUSSIAN_BT_0_3 = uint8(0x08)
+	GFSK_PULSE_SHAPE_GAUSSIAN_BT_0_5 = uint8(0x09)
+	GFSK_PULSE_SHAPE_GAUSSIAN_BT_0_7 = uint8(0x0A)
+	GFSK_PULSE_SHAPE_GAUSSIAN_BT_1_0 = uint8(0x0B)
 
-	//SX126X_CMD_SET_PACKET_TYPE
-	SX126X_PACKET_TYPE_GFSK = 0x00 //  7     0     packet type: GFSK
-	SX126X_PACKET_TYPE_LORA = 0x01 //  7     0                  LoRa
+	// Bandwidth
+	GFSK_RX_BW_4800   = uint8(0x1F)
+	GFSK_RX_BW_5800   = uint8(0x17)
+	GFSK_RX_BW_7300   = uint8(0x0F)
+	GFSK_RX_BW_9700   = uint8(0x1E)
+	GFSK_RX_BW_11700  = uint8(0x16)
+	GFSK_RX_BW_14600  = uint8(0x0E)
+	GFSK_RX_BW_19500  = uint8(0x1D)
+	GFSK_RX_BW_23400  = uint8(0x15)
+	GFSK_RX_BW_29300  = uint8(0x0D)
+	GFSK_RX_BW_39000  = uint8(0x1C)
+	GFSK_RX_BW_46900  = uint8(0x14)
+	GFSK_RX_BW_58600  = uint8(0x0C)
+	GFSK_RX_BW_78200  = uint8(0x1B)
+	GFSK_RX_BW_93800  = uint8(0x13)
+	GFSK_RX_BW_117300 = uint8(0x0B)
+	GFSK_RX_BW_156200 = uint8(0x1A)
+	GFSK_RX_BW_187200 = uint8(0x12)
+	GFSK_RX_BW_234300 = uint8(0x0A)
+	GFSK_RX_BW_312000 = uint8(0x19)
+	GFSK_RX_BW_373600 = uint8(0x11)
+	GFSK_RX_BW_467000 = uint8(0x09)
 
-	//SX126X_CMD_SET_TX_PARAMS
-	SX126X_PA_RAMP_10U   = 0x00 //  7     0     ramp time: 10 us
-	SX126X_PA_RAMP_20U   = 0x01 //  7     0                20 us
-	SX126X_PA_RAMP_40U   = 0x02 //  7     0                40 us
-	SX126X_PA_RAMP_80U   = 0x03 //  7     0                80 us
-	SX126X_PA_RAMP_200U  = 0x04 //  7     0                200 us
-	SX126X_PA_RAMP_800U  = 0x05 //  7     0                800 us
-	SX126X_PA_RAMP_1700U = 0x06 //  7     0                1700 us
-	SX126X_PA_RAMP_3400U = 0x07 //  7     0                3400 us
+	// Lora Modulation Params
+	LORA_SF_5  = uint8(0x05)
+	LORA_SF_6  = uint8(0x06)
+	LORA_SF_7  = uint8(0x07)
+	LORA_SF_8  = uint8(0x08)
+	LORA_SF_9  = uint8(0x09)
+	LORA_SF_10 = uint8(0x0A)
+	LORA_SF_11 = uint8(0x0B)
+	LORA_SF_12 = uint8(0x0C)
 
-	//SX126X_CMD_SET_MODULATION_PARAMS
-	SX126X_GFSK_FILTER_NONE      = 0x00 //  7     0     GFSK filter: none
-	SX126X_GFSK_FILTER_GAUSS_0_3 = 0x08 //  7     0                  Gaussian, BT = 0.3
-	SX126X_GFSK_FILTER_GAUSS_0_5 = 0x09 //  7     0                  Gaussian, BT = 0.5
-	SX126X_GFSK_FILTER_GAUSS_0_7 = 0x0A //  7     0                  Gaussian, BT = 0.7
-	SX126X_GFSK_FILTER_GAUSS_1   = 0x0B //  7     0                  Gaussian, BT = 1
-	SX126X_GFSK_RX_BW_4_8        = 0x1F //  7     0     GFSK Rx bandwidth: 4.8 kHz
-	SX126X_GFSK_RX_BW_5_8        = 0x17 //  7     0                        5.8 kHz
-	SX126X_GFSK_RX_BW_7_3        = 0x0F //  7     0                        7.3 kHz
-	SX126X_GFSK_RX_BW_9_7        = 0x1E //  7     0                        9.7 kHz
-	SX126X_GFSK_RX_BW_11_7       = 0x16 //  7     0                        11.7 kHz
-	SX126X_GFSK_RX_BW_14_6       = 0x0E //  7     0                        14.6 kHz
-	SX126X_GFSK_RX_BW_19_5       = 0x1D //  7     0                        19.5 kHz
-	SX126X_GFSK_RX_BW_23_4       = 0x15 //  7     0                        23.4 kHz
-	SX126X_GFSK_RX_BW_29_3       = 0x0D //  7     0                        29.3 kHz
-	SX126X_GFSK_RX_BW_39_0       = 0x1C //  7     0                        39.0 kHz
-	SX126X_GFSK_RX_BW_46_9       = 0x14 //  7     0                        46.9 kHz
-	SX126X_GFSK_RX_BW_58_6       = 0x0C //  7     0                        58.6 kHz
-	SX126X_GFSK_RX_BW_78_2       = 0x1B //  7     0                        78.2 kHz
-	SX126X_GFSK_RX_BW_93_8       = 0x13 //  7     0                        93.8 kHz
-	SX126X_GFSK_RX_BW_117_3      = 0x0B //  7     0                        117.3 kHz
-	SX126X_GFSK_RX_BW_156_2      = 0x1A //  7     0                        156.2 kHz
-	SX126X_GFSK_RX_BW_187_2      = 0x12 //  7     0                        187.2 kHz
-	SX126X_GFSK_RX_BW_234_3      = 0x0A //  7     0                        234.3 kHz
-	SX126X_GFSK_RX_BW_312_0      = 0x19 //  7     0                        312.0 kHz
-	SX126X_GFSK_RX_BW_373_6      = 0x11 //  7     0                        373.6 kHz
-	SX126X_GFSK_RX_BW_467_0      = 0x09 //  7     0                        467.0 kHz
-	SX126X_LORA_BW_7_8           = 0x00 //  7     0     LoRa bandwidth: 7.8 kHz
-	SX126X_LORA_BW_10_4          = 0x08 //  7     0                     10.4 kHz
-	SX126X_LORA_BW_15_6          = 0x01 //  7     0                     15.6 kHz
-	SX126X_LORA_BW_20_8          = 0x09 //  7     0                     20.8 kHz
-	SX126X_LORA_BW_31_25         = 0x02 //  7     0                     31.25 kHz
-	SX126X_LORA_BW_41_7          = 0x0A //  7     0                     41.7 kHz
-	SX126X_LORA_BW_62_5          = 0x03 //  7     0                     62.5 kHz
-	SX126X_LORA_BW_125_0         = 0x04 //  7     0                     125.0 kHz
-	SX126X_LORA_BW_250_0         = 0x05 //  7     0                     250.0 kHz
-	SX126X_LORA_BW_500_0         = 0x06 //  7     0                     500.0 kHz
+	LORA_BW_7   = uint8(0x00)
+	LORA_BW_10  = uint8(0x08)
+	LORA_BW_15  = uint8(0x01)
+	LORA_BW_20  = uint8(0x09)
+	LORA_BW_31  = uint8(0x02)
+	LORA_BW_41  = uint8(0x0A)
+	LORA_BW_62  = uint8(0x03)
+	LORA_BW_125 = uint8(0x04)
+	LORA_BW_250 = uint8(0x05)
+	LORA_BW_500 = uint8(0x06)
 
-	//SX126X_CMD_SET_PACKET_PARAMS
-	SX126X_GFSK_PREAMBLE_DETECT_OFF         = 0x00 //  7     0     GFSK minimum preamble length before reception starts: detector disabled
-	SX126X_GFSK_PREAMBLE_DETECT_8           = 0x04 //  7     0                                                           8 bits
-	SX126X_GFSK_PREAMBLE_DETECT_16          = 0x05 //  7     0                                                           16 bits
-	SX126X_GFSK_PREAMBLE_DETECT_24          = 0x06 //  7     0                                                           24 bits
-	SX126X_GFSK_PREAMBLE_DETECT_32          = 0x07 //  7     0                                                           32 bits
-	SX126X_GFSK_ADDRESS_FILT_OFF            = 0x00 //  7     0     GFSK address filtering: disabled
-	SX126X_GFSK_ADDRESS_FILT_NODE           = 0x01 //  7     0                             node only
-	SX126X_GFSK_ADDRESS_FILT_NODE_BROADCAST = 0x02 //  7     0                             node and broadcast
-	SX126X_GFSK_PACKET_FIXED                = 0x00 //  7     0     GFSK packet type: fixed (payload length known in advance to both sides)
-	SX126X_GFSK_PACKET_VARIABLE             = 0x01 //  7     0                       variable (payload length added to packet)
-	SX126X_GFSK_CRC_OFF                     = 0x01 //  7     0     GFSK packet CRC: disabled
-	SX126X_GFSK_CRC_1_BYTE                  = 0x00 //  7     0                      1 byte
-	SX126X_GFSK_CRC_2_BYTE                  = 0x02 //  7     0                      2 byte
-	SX126X_GFSK_CRC_1_BYTE_INV              = 0x04 //  7     0                      1 byte, inverted
-	SX126X_GFSK_CRC_2_BYTE_INV              = 0x06 //  7     0                      2 byte, inverted
-	SX126X_GFSK_WHITENING_OFF               = 0x00 //  7     0     GFSK data whitening: disabled
-	SX126X_GFSK_WHITENING_ON                = 0x01 //  7     0                          enabled
+	LORA_CR_4_5    = uint8(0x01)
+	LORA_CR_4_6    = uint8(0x02)
+	LORA_CR_4_7    = uint8(0x03)
+	LORA_CR_4_8    = uint8(0x04)
+	LORA_CR_4_5_LI = uint8(0x05)
+	LORA_CR_4_6_LI = uint8(0x06)
+	LORA_CR_4_8_LI = uint8(0x07)
 
-	//SX126X_CMD_SET_CAD_PARAMS
-	SX126X_CAD_ON_1_SYMB  = 0x00 //  7     0     number of symbols used for CAD: 1
-	SX126X_CAD_ON_2_SYMB  = 0x01 //  7     0                                     2
-	SX126X_CAD_ON_4_SYMB  = 0x02 //  7     0                                     4
-	SX126X_CAD_ON_8_SYMB  = 0x03 //  7     0                                     8
-	SX126X_CAD_ON_16_SYMB = 0x04 //  7     0                                     16
-	SX126X_CAD_GOTO_STDBY = 0x00 //  7     0     after CAD is done, always go to STDBY_RC mode
-	SX126X_CAD_GOTO_RX    = 0x01 //  7     0     after CAD is done, go to Rx mode if activity is detected
+	LORA_LOW_DATA_RATE_OPTIMIZE_OFF = uint8(0)
+	LORA_LOW_DATA_RATE_OPTIMIZE_ON  = uint8(1)
 
-	//SX126X_CMD_GET_STATUS
-	SX126X_STATUS_MODE_STDBY_RC   = 0b00100000 //  6     4     current chip mode: STDBY_RC
-	SX126X_STATUS_MODE_STDBY_XOSC = 0b00110000 //  6     4                        STDBY_XOSC
-	SX126X_STATUS_MODE_FS         = 0b01000000 //  6     4                        FS
-	SX126X_STATUS_MODE_RX         = 0b01010000 //  6     4                        RX
-	SX126X_STATUS_MODE_TX         = 0b01100000 //  6     4                        TX
-	SX126X_STATUS_DATA_AVAILABLE  = 0b00000100 //  3     1     command status: packet received and data can be retrieved
-	SX126X_STATUS_CMD_TIMEOUT     = 0b00000110 //  3     1                     SPI command timed out
-	SX126X_STATUS_CMD_INVALID     = 0b00001000 //  3     1                     invalid SPI command
-	SX126X_STATUS_CMD_FAILED      = 0b00001010 //  3     1                     SPI command failed to execute
-	SX126X_STATUS_TX_DONE         = 0b00001100 //  3     1                     packet transmission done
-	SX126X_STATUS_SPI_FAILED      = 0b11111111 //  7     0     SPI transaction failed
+	// GFSK Packet Params
+	GFSK_PREAMBLE_DETECTOR_LENGTH_OFF = uint8(0x00)
+	GFSK_PREAMBLE_DETECTOR_LENGTH_8   = uint8(0x04)
+	GFSK_PREAMBLE_DETECTOR_LENGTH_16  = uint8(0x05)
+	GFSK_PREAMBLE_DETECTOR_LENGTH_24  = uint8(0x06)
+	GFSK_PREAMBLE_DETECTOR_LENGTH_32  = uint8(0x07)
 
-	//SX126X_CMD_GET_PACKET_STATUS
-	SX126X_GFSK_RX_STATUS_PREAMBLE_ERR    = 0b10000000 //  7     7     GFSK Rx status: preamble error
-	SX126X_GFSK_RX_STATUS_SYNC_ERR        = 0b01000000 //  6     6                     sync word error
-	SX126X_GFSK_RX_STATUS_ADRS_ERR        = 0b00100000 //  5     5                     address error
-	SX126X_GFSK_RX_STATUS_CRC_ERR         = 0b00010000 //  4     4                     CRC error
-	SX126X_GFSK_RX_STATUS_LENGTH_ERR      = 0b00001000 //  3     3                     length error
-	SX126X_GFSK_RX_STATUS_ABORT_ERR       = 0b00000100 //  2     2                     abort error
-	SX126X_GFSK_RX_STATUS_PACKET_RECEIVED = 0b00000010 //  2     2                     packet received
-	SX126X_GFSK_RX_STATUS_PACKET_SENT     = 0b00000001 //  2     2                     packet sent
+	GFSK_ADDR_FILTERING_DISABLE        = uint8(0x00)
+	GFSK_ADDR_FILTERING_NODE           = uint8(0x01)
+	GFSK_ADDR_FILTERING_NODE_BROADCAST = uint8(0x02)
 
-	//SX126X_CMD_GET_DEVICE_ERRORS
-	SX126X_PA_RAMP_ERR     = 0b100000000 //  8     8     device errors: PA ramping failed
-	SX126X_PLL_LOCK_ERR    = 0b001000000 //  6     6                    PLL failed to lock
-	SX126X_XOSC_START_ERR  = 0b000100000 //  5     5                    crystal oscillator failed to start
-	SX126X_IMG_CALIB_ERR   = 0b000010000 //  4     4                    image calibration failed
-	SX126X_ADC_CALIB_ERR   = 0b000001000 //  3     3                    ADC calibration failed
-	SX126X_PLL_CALIB_ERR   = 0b000000100 //  2     2                    PLL calibration failed
-	SX126X_RC13M_CALIB_ERR = 0b000000010 //  1     1                    RC13M calibration failed
-	SX126X_RC64K_CALIB_ERR = 0b000000001 //  0     0                    RC64K calibration failed
+	GFSK_PACKET_FIXED_LENGTH    = uint8(0x00)
+	GFSK_PACKET_VARIABLE_LENGTH = uint8(0x01)
 
-	// SX126X SPI register variables
-	//SX126X_REG_LORA_SYNC_WORD_MSB + LSB
-	SX126X_SYNC_WORD_PUBLIC  = 0x34 // actually 0x3444  NOTE: The low nibbles in each byte (0x_4_4) are masked out since apparently, they're reserved.
-	SX126X_SYNC_WORD_PRIVATE = 0x12 // actually 0x1424        You couldn't make this up if you tried.
+	GFSK_CRC_OFF        = uint8(0x01)
+	GFSK_CRC_1_BYTE     = uint8(0x00)
+	GFSK_CRC_2_BYTE     = uint8(0x02)
+	GFSK_CRC_1_BYTE_INV = uint8(0x04)
+	GFSK_CRC_2_BYTE_INV = uint8(0x06)
 
-	SX126X_LORA_MAC_PUBLIC_SYNCWORD  = 0x3444
-	SX126X_LORA_MAC_PRIVATE_SYNCWORD = 0x1424
+	// Lora Packet Params
+	LORA_PACKET_FIXED_LENGTH    = uint8(0x00)
+	LORA_PACKET_VARIABLE_LENGTH = uint8(0x01)
+
+	LORA_CRC_OFF = uint8(0x00)
+	LORA_CRC_ON  = uint8(0x01)
+
+	LORA_IQ_STANDARD = uint8(0x00)
+	LORA_IQ_INVERTED = uint8(0x01)
+
+	// Cad Params
+	// cadSymbolNum
+	CAD_ON_1_SYMB  = uint8(0x00)
+	CAD_ON_2_SYMB  = uint8(0x01)
+	CAD_ON_4_SYMB  = uint8(0x02)
+	CAD_ON_8_SYMB  = uint8(0x03)
+	CAD_ON_16_SYMB = uint8(0x04)
+
+	CAD_EXIT_MODE_STDBY_RC = uint8(0x00)
+	CAD_EXIT_MODE_RX       = uint8(0x01)
+
+	// Status
+
+	// Chip Modes
+	CHIP_MODE_MASK      = uint8(0b01110000)
+	CHIP_MODE_STBY_RC   = uint8(0x2)
+	CHIP_MODE_STBY_XOSC = uint8(0x3)
+	CHIP_MODE_FS        = uint8(0x4)
+	CHIP_MODE_RX        = uint8(0x5)
+	CHIP_MODE_TX        = uint8(0x6)
+
+	COMMAND_STATUS_MASK                       = uint8(0b00001110)
+	COMMAND_STATUS_DATA_AVAILABLE             = uint8(0x2)
+	COMMAND_STATUS_COMMAND_TIMEOUT            = uint8(0x3)
+	COMMAND_STATUS_COMMAND_PROCESSING_ERROR   = uint8(0x4)
+	COMMAND_STATUS_FAILURE_TO_EXECUTE_COMMAND = uint8(0x5)
+	COMMAND_STATUS_COMMAND_TX_DONE            = uint8(0x6)
+
+	// Register Map
+	REG_HOPPING_ENABLE              = 0x0385
+	REG_PACKET_LENGTH               = 0x0386
+	REG_NB_HOPPING_BLOCKS           = 0x0387
+	REG_NB_SYMBOLS_0_MSB            = 0x0388
+	REG_NB_SYMBOLS_0_LSB            = 0x0389
+	REG_FREQ_0_BYTE_3               = 0x038A
+	REG_FREQ_0_BYTE_2               = 0x038B
+	REG_FREQ_0_BYTE_1               = 0x038C
+	REG_FREQ_0_BYTE_0               = 0x038D
+	REG_NB_SYMBOLS_1_MSB            = 0x038E
+	REG_NB_SYMBOLS_1_LSB            = 0x038F
+	REG_FREQ_1_BYTE_3               = 0x0390
+	REG_FREQ_1_BYTE_2               = 0x0391
+	REG_FREQ_1_BYTE_1               = 0x0392
+	REG_FREQ_1_BYTE_0               = 0x0393
+	REG_NB_SYMBOLS_2_MSB            = 0x0394
+	REG_NB_SYMBOLS_2_LSB            = 0x0395
+	REG_FREQ_2_BYTE_3               = 0x0396
+	REG_FREQ_2_BYTE_2               = 0x0397
+	REG_FREQ_2_BYTE_1               = 0x0398
+	REG_FREQ_2_BYTE_0               = 0x0399
+	REG_NB_SYMBOLS_3_MSB            = 0x039A
+	REG_NB_SYMBOLS_3_LSB            = 0x039B
+	REG_FREQ_3_BYTE_3               = 0x039C
+	REG_FREQ_3_BYTE_2               = 0x039D
+	REG_FREQ_3_BYTE_1               = 0x039E
+	REG_FREQ_3_BYTE_0               = 0x039F
+	REG_NB_SYMBOLS_4_MSB            = 0x03A0
+	REG_NB_SYMBOLS_4_LSB            = 0x03A1
+	REG_FREQ_4_BYTE_3               = 0x03A2
+	REG_FREQ_4_BYTE_2               = 0x03A3
+	REG_FREQ_4_BYTE_1               = 0x03A4
+	REG_FREQ_4_BYTE_0               = 0x03A5
+	REG_NB_SYMBOLS_5_MSB            = 0x03A6
+	REG_NB_SYMBOLS_5_LSB            = 0x03A7
+	REG_FREQ_5_BYTE_3               = 0x03A8
+	REG_FREQ_5_BYTE_2               = 0x03A9
+	REG_FREQ_5_BYTE_1               = 0x03AA
+	REG_FREQ_5_BYTE_0               = 0x03AB
+	REG_NB_SYMBOLS_6_MSB            = 0x03AC
+	REG_NB_SYMBOLS_6_LSB            = 0x03AD
+	REG_FREQ_6_BYTE_3               = 0x03AE
+	REG_FREQ_6_BYTE_2               = 0x03AF
+	REG_FREQ_6_BYTE_1               = 0x03B0
+	REG_FREQ_6_BYTE_0               = 0x03B1
+	REG_NB_SYMBOLS_7_MSB            = 0x03B2
+	REG_NB_SYMBOLS_7_LSB            = 0x03B3
+	REG_FREQ_7_BYTE_3               = 0x03B4
+	REG_FREQ_7_BYTE_2               = 0x03B5
+	REG_FREQ_7_BYTE_1               = 0x03B6
+	REG_FREQ_7_BYTE_0               = 0x03B7
+	REG_NB_SYMBOLS_8_MSB            = 0x03B8
+	REG_NB_SYMBOLS_8_LSB            = 0x03B9
+	REG_FREQ_8_BYTE_3               = 0x03BA
+	REG_FREQ_8_BYTE_2               = 0x03BB
+	REG_FREQ_8_BYTE_1               = 0x03BC
+	REG_FREQ_8_BYTE_0               = 0x03BD
+	REG_NB_SYMBOLS_9_MSB            = 0x03BE
+	REG_NB_SYMBOLS_9_LSB            = 0x03BF
+	REG_FREQ_9_BYTE_3               = 0x03C0
+	REG_FREQ_9_BYTE_2               = 0x03C1
+	REG_FREQ_9_BYTE_1               = 0x03C2
+	REG_FREQ_9_BYTE_0               = 0x03C3
+	REG_NB_SYMBOLS_10_MSB           = 0x03C4
+	REG_NB_SYMBOLS_10_LSB           = 0x03C5
+	REG_FREQ_10_BYTE_3              = 0x03C6
+	REG_FREQ_10_BYTE_2              = 0x03C7
+	REG_FREQ_10_BYTE_1              = 0x03C8
+	REG_FREQ_10_BYTE_0              = 0x03C9
+	REG_NB_SYMBOLS_11_MSB           = 0x03CA
+	REG_NB_SYMBOLS_11_LSB           = 0x03CB
+	REG_FREQ_11_BYTE_3              = 0x03CC
+	REG_FREQ_11_BYTE_2              = 0x03CD
+	REG_FREQ_11_BYTE_1              = 0x03CE
+	REG_FREQ_11_BYTE_0              = 0x03CF
+	REG_NB_SYMBOLS_12_MSB           = 0x03D0
+	REG_NB_SYMBOLS_12_LSB           = 0x03D1
+	REG_FREQ_12_BYTE_3              = 0x03D2
+	REG_FREQ_12_BYTE_2              = 0x03D3
+	REG_FREQ_12_BYTE_1              = 0x03D4
+	REG_FREQ_12_BYTE_0              = 0x03D5
+	REG_NB_SYMBOLS_13_MSB           = 0x03D6
+	REG_NB_SYMBOLS_13_LSB           = 0x03D7
+	REG_FREQ_13_BYTE_3              = 0x03D8
+	REG_FREQ_13_BYTE_2              = 0x03D9
+	REG_FREQ_13_BYTE_1              = 0x03DA
+	REG_FREQ_13_BYTE_0              = 0x03DB
+	REG_NB_SYMBOLS_14_MSB           = 0x03DC
+	REG_NB_SYMBOLS_14_LSB           = 0x03DD
+	REG_FREQ_14_BYTE_3              = 0x03DE
+	REG_FREQ_14_BYTE_2              = 0x03DF
+	REG_FREQ_14_BYTE_1              = 0x03E0
+	REG_FREQ_14_BYTE_0              = 0x03E1
+	REG_NB_SYMBOLS_15_MSB           = 0x03E2
+	REG_NB_SYMBOLS_15_LSB           = 0x03E3
+	REG_FREQ_15_BYTE_3              = 0x03E4
+	REG_FREQ_15_BYTE_2              = 0x03E5
+	REG_FREQ_15_BYTE_1              = 0x03E6
+	REG_FREQ_15_BYTE_0              = 0x03E7
+	REG_DIOX_OUTPUT_ENABLE          = 0x0580
+	REG_DIOX_INPUT_ENABLE           = 0x0583
+	REG_DIOX_PULL_UP_CONTROL        = 0x0584
+	REG_DIOX_PULL_DOWN_CONTROL      = 0x0585
+	REG_WHITENING_VALUE_MSB         = 0x06B8
+	REG_WHITENING_VALUE_LSB         = 0x06B9
+	REG_CRC_MSB_INITIAL_VALUE       = 0x06BC
+	REG_CRC_LSB_INITIAL_VALUE       = 0x06BD
+	REG_CRC_MSB_POLYNOMIAL_VALUE    = 0x06BE
+	REG_CRC_LSB_POLYNOMIAL_VALUE    = 0x06BF
+	REG_SYNC_WORD_BYTE_0            = 0x06C0
+	REG_SYNC_WORD_BYTE_1            = 0x06C1
+	REG_SYNC_WORD_BYTE_2            = 0x06C2
+	REG_SYNC_WORD_BYTE_3            = 0x06C3
+	REG_SYNC_WORD_BYTE_4            = 0x06C4
+	REG_SYNC_WORD_BYTE_5            = 0x06C5
+	REG_SYNC_WORD_BYTE_6            = 0x06C6
+	REG_SYNC_WORD_BYTE_7            = 0x06C7
+	REG_NODE_ADDRESS                = 0x06CD
+	REG_BROADCAST_ADDRESS           = 0x06CE
+	REG_IQ_POLARITY_SETUP           = 0x0736
+	REG_LORA_SYNC_WORD_MSB          = 0x0740
+	REG_LORA_SYNC_WORD_LSB          = 0x0741
+	REG_LORA_CODING_RATE_RX         = 0x0749
+	REG_LORA_CRC_CONFIGURATION_RX   = 0x076B
+	REG_DCC_CTRL                    = 0x0805
+	REG_MIX_CTRL                    = 0x0806
+	REG_MIX_MODE                    = 0x0818
+	REG_IF_FREQ_BYTE_0              = 0x088F
+	REG_IF_FREQ_BYTE_1              = 0x0890
+	REG_IF_FREQ_BYTE_2              = 0x0891
+	REG_RANDOM_NUMBER_GEN_BYTE_0    = 0x0819
+	REG_RANDOM_NUMBER_GEN_BYTE_1    = 0x081A
+	REG_RANDOM_NUMBER_GEN_BYTE_2    = 0x081B
+	REG_RANDOM_NUMBER_GEN_BYTE_3    = 0x081C
+	REG_TX_MODULATION               = 0x0889
+	REG_RX_GAIN                     = 0x08AC
+	REG_TX_CLAMP_CONFIG             = 0x08D8
+	REG_OCP_CONFIGURATION           = 0x08E7
+	REG_RTC_CONTROL                 = 0x0902
+	REG_XTA_TRIM                    = 0x0911
+	REG_XTB_TRIM                    = 0x0912
+	REG_DIO3_OUTPUT_VOLTAGE_CONTROL = 0x0920
+	REG_EVENT_MASK                  = 0x0944
 )
